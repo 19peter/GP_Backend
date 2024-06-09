@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
 
     email: {
         type: String,
-        required: true
+        required: true,
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     },
 
     password: {
@@ -22,7 +23,7 @@ const userSchema = new mongoose.Schema({
     },
 
     owned_cars : {
-        type: [{make : String, model : String, year: Number}]
+        type: [{make : String, model : String, year: Number}],
     },
 })
 

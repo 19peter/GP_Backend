@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const serviceProviderSchema = new mongoose.Schema({
     location: {
-        type : String,
+        type: [String],
         required: true
     },
 
@@ -13,7 +13,7 @@ const serviceProviderSchema = new mongoose.Schema({
         required: true
     },
 
-    name : {
+    name: {
         type: String,
         required: true
     },
@@ -25,7 +25,8 @@ const serviceProviderSchema = new mongoose.Schema({
 
     email: {
         type: String,
-        required: true
+        required: true,
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     },
 
     password: {
@@ -35,33 +36,36 @@ const serviceProviderSchema = new mongoose.Schema({
 
     profile_pic: {
         type: String,
-        required: true
+        required: true,
+        match: /^https:\/\/.+/
     },
 
     driving_lic: {
         type: String,
-        required: true
-    }, 
+        required: true,
+        match: /^https:\/\/.+/
+    },
 
     car_lic: {
         type: String,
-        required: true
+        required: true,
+        match: /^https:\/\/.+/
     },
 
     nid_pic: {
         type: String,
-        required: true
-    },
-
-    owned_cars : {
-        type: [{make : String, model : String, year: Number}]
-    },
-
-    license_plate : {
-        type: String,
         required: true,
-        pattern: "/^[1-9]{3,4}[A-Za-z]{2,3}$/"
-    }
+        match: /^https:\/\/.+/
+    },
+
+    owned_cars: {
+        type: [{
+            make: { type: String, required: true },
+            model: { type: String, required: true },
+            year: { type: Number, required: true },
+            license_plate: { type: String, required: true, pattern: "/^[1-9]{3,4}[A-Za-z]{2,3}$/" }
+        }]
+    },
 })
 
 
