@@ -58,13 +58,11 @@ const serviceProviderSchema = new mongoose.Schema({
         match: /^https:\/\/.+/
     },
 
-    owned_cars: {
-        type: [{
-            make: { type: String, required: true },
-            model: { type: String, required: true },
-            year: { type: Number, required: true },
-            license_plate: { type: String, required: true, pattern: "/^[1-9]{3,4}[A-Za-z]{2,3}$/" }
-        }]
+    owned_car: {
+        make: { type: String, required: true },
+        model: { type: String, required: true },
+        year: { type: Number, required: true },
+        license_plate: { type: String, required: true, pattern: "/^[1-9]{3,4}[A-Za-z]{2,3}$/" }
     },
 })
 
