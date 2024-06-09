@@ -1,0 +1,8 @@
+{"web":{
+    "client_id":"751702095474-r1p82a98f98lldiondihh6umiff1vjvv.apps.googleusercontent.com",
+    "project_id":"gpbackend-425916",
+    "auth_uri":"https://accounts.google.com/o/oauth2/auth",
+    "token_uri":"https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret":"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",
+    "redirect_uris":["http://localhost:8000"]}}
