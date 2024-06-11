@@ -17,7 +17,7 @@ const serviceProviderSchema = new mongoose.Schema({
 
     status: {
         type: String,
-        enum: ["Busy", "Available"],
+        enum: ["busy", "available"],
     },
 
     price_per_km: {
@@ -26,7 +26,7 @@ const serviceProviderSchema = new mongoose.Schema({
 
     service_type: {
         type: String,
-        enum: ["Repair", "PickUp", "PickUp And Repair"],
+        enum: ["repair", "pickUp", "pickUp and repair"],
         required: true
     },
 
@@ -86,7 +86,7 @@ serviceProviderSchema.pre('save', function (next) {
         this.profile_pic = `${this.email}_Profile.jpg`;
     }
 
-    this.status = "Available";
+    this.status = "available";
     next();
 });
 

@@ -1,0 +1,5 @@
+app entry : 
+    server.js : application without using webSockets
+    socketServer.js: application using webSockets
+
+    configure app entry in package.json

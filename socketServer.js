@@ -1,22 +1,36 @@
+const http = require('http')
 const express = require('express');
 const mongoose = require('mongoose');
+const socketIo = require('socket.io');
 const cors = require("cors");
+const IdMap = require('./Utils/ConnectedUsers/connectedUsers');
 
+const TestRouter = require('./Routes/TestingRoute')
 const UserRouter = require("./Routes/UserRoutes");
 const ServiceProviderRouter = require('./Routes/ServiceProviderRoute');
 
-
 const PORT = 8000;
 const app = express();
+const Server = http.createServer(app);
+
+////Socket Init... !DONOT CHANGE!...
+const io = socketIo(Server, {
+    cors: '*'
+});
+module.exports = io;
+require('./Utils/SocketIoEvents/socketEvents')();
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
+
+
 mongoose.connect("mongodb+srv://Peter:TZ8eXrltEYMuVdQb@cluster0.f1z37qq.mongodb.net/Graduation_Project")
     .then(() => {
-        app.listen(PORT, () => {
-            
+        Server.listen(PORT, () => {
+
             app.get("/", (req, res) => {
                 res.send("hello to server")
             })
@@ -24,6 +38,9 @@ mongoose.connect("mongodb+srv://Peter:TZ8eXrltEYMuVdQb@cluster0.f1z37qq.mongodb.
             app.use("/api/user", UserRouter);
 
             app.use('/api/serviceProvider', ServiceProviderRouter);
+
+            ///TESTING ROUTE
+            app.use('/api/test', TestRouter);
 
 
             console.log("listening on port http://localhost:" + PORT);
