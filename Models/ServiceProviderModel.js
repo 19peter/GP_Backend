@@ -4,7 +4,24 @@ const mongoose = require('mongoose');
 const serviceProviderSchema = new mongoose.Schema({
     location: {
         type: [String],
-        required: true
+    },
+
+    live_location: {
+        type: [String]
+    },
+
+    location: {
+        live_location: { type: [String] },
+        static_location: { type: [String] }
+    },
+
+    status: {
+        type: String,
+        enum: ["Busy", "Available"],
+    },
+
+    price_per_km: {
+        type: Number
     },
 
     service_type: {
@@ -35,28 +52,26 @@ const serviceProviderSchema = new mongoose.Schema({
     },
 
     profile_pic: {
-        type: String,
-        required: true,
-        match: /^https:\/\/.+/
+        type: String
     },
 
-    driving_lic: {
-        type: String,
-        required: true,
-        match: /^https:\/\/.+/
-    },
+    // driving_lic: {
+    //     type: String,
+    //     required: true,
+    //     match: /^https:\/\/.+/
+    // },
 
-    car_lic: {
-        type: String,
-        required: true,
-        match: /^https:\/\/.+/
-    },
+    // car_lic: {
+    //     type: String,
+    //     required: true,
+    //     match: /^https:\/\/.+/
+    // },
 
-    nid_pic: {
-        type: String,
-        required: true,
-        match: /^https:\/\/.+/
-    },
+    // nid_pic: {
+    //     type: String,
+    //     required: true,
+    //     match: /^https:\/\/.+/
+    // },
 
     owned_car: {
         make: { type: String, required: true },
@@ -66,5 +81,13 @@ const serviceProviderSchema = new mongoose.Schema({
     },
 })
 
+serviceProviderSchema.pre('save', function (next) {
+    if (this.email) {
+        this.profile_pic = `${this.email}_Profile.jpg`;
+    }
+
+    this.status = "Available";
+    next();
+});
 
 module.exports = mongoose.model("ServiceProvider", serviceProviderSchema);

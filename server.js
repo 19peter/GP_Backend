@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+
 const UserRouter = require("./Routes/UserRoutes");
 const ServiceProviderRouter = require('./Routes/ServiceProviderRoute');
 
@@ -8,7 +9,6 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 
 mongoose.connect("mongodb+srv://Peter:TZ8eXrltEYMuVdQb@cluster0.f1z37qq.mongodb.net/Graduation_Project")
     .then(() => {

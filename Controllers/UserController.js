@@ -1,10 +1,16 @@
 const userModel = require('../Models/UserModel');
 
-let createUser = (req, res) => {
+let createUser = async(req, res) => {
     let data = req.body;
     let { make, model, year } = data;
     let owned_cars = [];
     let newUser;
+
+    let duplicateEmail = await userModel.findOne({email : email});
+
+    if (duplicateEmail) {
+        return res.status(400).json("Bad Request, Email is already registered")
+    }
 
     const keysToRemove = ['make', 'model', 'year'];
 
@@ -164,5 +170,6 @@ let deleteUser = async (req, res) => {
     }
 
 }
+
 
 module.exports = { createUser, updateUser, updateUserCars, updateCurrentCar, deleteCar, deleteUser }
