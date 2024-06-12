@@ -3,7 +3,7 @@ class IdMap {
     ////MAP HAS KEY VALUE PAIR: 
     /// { 
     /// KEY: USER ID FROM DB,
-    /// VALUE: {socketId, socket}   socket is socket obj used for emitting data,
+    /// VALUE: {socket, isAvailable}
     /// }
 
 
@@ -17,7 +17,7 @@ class IdMap {
 
     
 
-    setCurrentAndSocket(id, socketInfo) {
+    setCurrentAndSocket(id, socketInfo, providerState) {
         this.idMap.set(id, socketInfo);
     }
 
@@ -27,6 +27,10 @@ class IdMap {
 
     getSocketInfo(id) {
         return this.idMap.get(id);
+    }
+
+    getMap() {
+        return this.idMap;
     }
 }
 

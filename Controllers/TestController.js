@@ -9,7 +9,7 @@ let testingResponse = (req, res, next) => {
 
 let testingPost = (req, res, next) => {
     const io = require('../socketServer');
-    const IdMap = require('../Utils/ConnectedUsers/connectedUsers');
+    const IdMap = require('../Utils/ConnectedUsers/connectedConsumers');
 
     let data = req.body;
     let { targetId } = data;

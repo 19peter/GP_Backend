@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const socketIo = require('socket.io');
 const cors = require("cors");
-const IdMap = require('./Utils/ConnectedUsers/connectedUsers');
+const IdMap = require('./Utils/ConnectedUsers/connectedConsumers');
 
 const TestRouter = require('./Routes/TestingRoute')
 const UserRouter = require("./Routes/UserRoutes");
