@@ -15,12 +15,15 @@ class IdMap {
         return IdMap.instance;
     }
 
-    
 
-    setCurrentAndSocket(id, socketInfo) {
+
+    setCurrentAndSocket(id, socketInfo, availabilityState) {
+        let obj = {...socketInfo, isAvailable : availabilityState};
+        Object.assign(socketInfo, obj);
+        // socketInfo.isAvailable = availabilityState;
         this.idMap.set(id, socketInfo);
     }
-
+    
     setCurrentId(id) {
         this.idMap.set(id, null);
     }
@@ -31,11 +34,14 @@ class IdMap {
 
     setProviderAvailabilityState(id, availabilityState) {
         let socket = this.idMap.get(id);
-        socket.isAvailable = availabilityState;
-        this.idMap.set(id, socket);
+        this.setCurrentAndSocket(id, socket, availabilityState);
     }
 
-    
+    deleteProvider(id) {
+        this.idMap.delete(id);
+    }
+
+
 }
 
 const idMapInstance = new IdMap();

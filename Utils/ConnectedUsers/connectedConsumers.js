@@ -29,8 +29,8 @@ class IdMap {
         return this.idMap.get(id);
     }
 
-    getMap() {
-        return this.idMap;
+    deleteConsumer(id) {
+        this.idMap.delete(id);
     }
 }
 
