@@ -3,7 +3,7 @@ class IdMap {
     ////MAP HAS KEY VALUE PAIR: 
     /// { 
     /// KEY: USER ID FROM DB,
-    /// VALUE: [{providerId, socket}]
+    /// VALUE: [{providerId, location}]
     /// }
 
 
@@ -16,10 +16,10 @@ class IdMap {
     }
 
 
+    ///socketInf = {providerId, location}
+    setProvidersArrayForConsumer(id, socketInfo) {
 
-    setCurrentAndSocket(id, socketInfo) {
-
-        let providersArray = this.getSocketInfo(id) || [];
+        let providersArray = this.getProvidersForConsumer(id) || [];
         let providerId = socketInfo.providerId;
 
         let doesIdExist = false;
@@ -44,16 +44,24 @@ class IdMap {
         }
     }
 
-    setCurrentId(id) {
+    setConsumer(id) {
         this.idMap.set(id, null);
     }
 
-    getSocketInfo(id) {
+    getProvidersForConsumer(id) {
         return this.idMap.get(id);
     }
 
-    getMap() {
-        return this.idMap;
+    getMapLength() {
+        return this.idMap.size;
+    }
+
+    getProvidersLengthForConsumer(id) {
+        return this.getProvidersForConsumer(id).length;
+    }
+
+    deleteConsumer(id) {
+        this.idMap.delete(id);
     }
 }
 

@@ -12,7 +12,15 @@
 ///------------------------------------------------------------------------------///
 
 ///------------------------------------EVENTS FLOW------------------------------------///
-///Consumer => ("GetNearBy") => Server => ("AreYouAvailble") => Provider ? availble => Server ("", LiveLocation) => filter => Consumer 
+
+//----------GetNearBy Functionality
+
+///Consumer => ("GetNearBy") => Server => "GetLocation", { consumerId, providerId, availableProvidersLength } => Available Provider
+///Available Provider => "Location" => Server => "SentAvailable" => Consumer
+
+
+//----------SendRequest Functionality
+
 ///Consumer => ("SentRequest", {consumerId, providerId - targetId- , consumerLocation}) => Server => ("IncomingRequest", consumerLocation, consumerId) => Provider
 ///{
 ///Provider => ("Tracked", {providerId, consumerId, providerLiveLocation, consumerLocation}) => Server => ("Tracking", providerLiveLocation) => Consumer
@@ -41,7 +49,7 @@ module.exports = () => {
         const ConsumerIdMap = require('../ConnectedUsers/connectedConsumers');
         const ProviderIdMap = require('../ConnectedUsers/connectedProviders');
         const ConsumerNearByProviderIdMap = require('../ConnectedUsers/consumerNearByMap');
-        // console.log(IdMap);
+        let consumerRequests = new Map();
 
         socket.on('connected', ({ id, type }) => {
             if (type === 'consumer') {
@@ -50,7 +58,8 @@ module.exports = () => {
                 // console.log(ConsumerIdMap);
 
             } else if (type === 'provider') {
-                ProviderIdMap.setCurrentAndSocket(id, socket)
+                ProviderIdMap.setCurrentAndSocket(id, socket, true)
+                ProviderIdMap.setProviderAvailabilityState(id, true)
                 console.log("provider connected to socket ");
                 // console.log(ProviderIdMap);
 
@@ -58,31 +67,51 @@ module.exports = () => {
         })
 
         socket.on("GetNearBy", ({ userId: consumerId }) => {
-            for (let map in ProviderIdMap) {
-                ProviderIdMap[map].forEach(element => {
-                    element.emit("AreYouAvailable", { consumerId });
-                });
-            }
+
+            ConsumerNearByProviderIdMap.deleteConsumer(consumerId);
+
+            let idMap = Object.values(ProviderIdMap)[0];
+            let availableProvidersArray = [];
+            idMap.forEach((socket, providerId) => {
+                if (socket.isAvailable) {
+                    availableProvidersArray.push({ providerId, socket });
+                }
+            });
+
+            let availableProvidersLength = availableProvidersArray.length;
+            availableProvidersArray.forEach(provider => {
+                let providerId = provider.providerId;
+                provider.socket.emit("GetLocation", { consumerId, providerId, availableProvidersLength });
+            })
         })
 
         //Provider 1
         //Provider 2
-        socket.on("Available", ({ userId: providerId, location, consumerId }) => {
-
+        socket.on("Location", ({ consumerId, providerId, availableProvidersLength, location }) => {
             let dto = { providerId, location };
-            ConsumerNearByProviderIdMap.setCurrentAndSocket(consumerId, dto);
+            ConsumerNearByProviderIdMap.setProvidersArrayForConsumer(consumerId, dto);
+            let providersLengthForConsumer = ConsumerNearByProviderIdMap.getProvidersLengthForConsumer(consumerId);
+            console.log(providersLengthForConsumer);
+            if (+availableProvidersLength === +providersLengthForConsumer) {
 
-            let consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
-            consumerSocket.emit("SentAvailable", ConsumerNearByProviderIdMap.getSocketInfo(consumerId));
+                let consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
+                consumerSocket.emit("SentAvailable", ConsumerNearByProviderIdMap.getProvidersForConsumer(consumerId));
+
+            }
 
         })
 
-        socket.on("SentRequest", ({ userId, targetId, consumerLocation }) => {
-            const targetSocket = ProviderIdMap.getSocketInfo(targetId);
-            if (targetSocket) {
-                targetSocket.emit("IncomingRequest", { requestMessage: "Allow Request ?", consumerLocation })
-                console.log(userId + " requested " + targetId);
+        socket.on("SentRequest", ({ userId: consumerId, targetId: providerId, consumerLocation }) => {
+            const providerSocket = ProviderIdMap.getSocketInfo(targetId);
+            if (providerSocket) {
+                providerSocket.emit("IncomingRequest", { requestMessage: "Allow Request ?", consumerLocation, consumerId })
+                console.log(consumerId + " requested " + providerId);
             }
+        })
+
+        socket.on("RequestAccepted", ({ consumerId, userId: providerId }) => {
+            ConsumerNearByProviderIdMap.deleteConsumer(consumerId);
+            ProviderIdMap.setProviderAvailabilityState(providerId, false);
         })
 
         socket.on("Tracked", ({ userId: providerId, targetId: consumerId, location, targetLocation }) => {

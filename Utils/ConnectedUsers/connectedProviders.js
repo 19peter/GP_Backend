@@ -17,7 +17,7 @@ class IdMap {
 
     
 
-    setCurrentAndSocket(id, socketInfo, providerState) {
+    setCurrentAndSocket(id, socketInfo) {
         this.idMap.set(id, socketInfo);
     }
 
@@ -29,9 +29,13 @@ class IdMap {
         return this.idMap.get(id);
     }
 
-    getMap() {
-        return this.idMap;
+    setProviderAvailabilityState(id, availabilityState) {
+        let socket = this.idMap.get(id);
+        socket.isAvailable = availabilityState;
+        this.idMap.set(id, socket);
     }
+
+    
 }
 
 const idMapInstance = new IdMap();
