@@ -22,6 +22,7 @@ module.exports = async (req, res, next) => {
 
         files.map(async (f) => {
 
+            console.log(f);
             let filePath = path.join(__dirname, `../uploads/${f.originalname}`);
 
             if (f.originalname !== 'userprofile.jpg') {

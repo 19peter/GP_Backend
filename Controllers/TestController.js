@@ -1,8 +1,8 @@
 
 let testingResponse = (req, res, next) => {
-    const io = require('../socketServer');
+    // const io = require('../socketServer');
 
-    io.emit("notification", { message: "test notification" })
+    // io.emit("notification", { message: "test notification" })
     // console.log(io);
     return res.json({ response: "test response" });
 }

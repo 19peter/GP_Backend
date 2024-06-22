@@ -11,7 +11,24 @@ let createServiceProvider = async (req, res, next) => {
             return res.status(400).json("Bad Request, Email is already registered")
         }
 
-        let newSProvider = new serviceProviderModel(parsedData);
+        const keysToRemove = ['make', 'model', 'year'];
+
+        let owned_car = {};
+        let sanitizedUser = Object.keys(parsedData).reduce((acc, key) => {
+            if (!keysToRemove.includes(key)) {
+                acc[key] = parsedData[key];
+                // console.log(acc);
+            }
+            return acc;
+        }, {})
+
+        if (make && model && year) {
+            owned_car = { make, model, year };
+        }
+
+        sanitizedUser.owned_car = owned_car;
+
+        let newSProvider = new serviceProviderModel(sanitizedUser);
 
         newSProvider.save()
             .then(() => {

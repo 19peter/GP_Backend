@@ -10,6 +10,7 @@ const UserRouter = require("./Routes/UserRoutes");
 const ServiceProviderRouter = require('./Routes/ServiceProviderRoute');
 
 const PORT = 8000;
+const IP = '192.168.1.10';
 const app = express();
 const Server = http.createServer(app);
 
@@ -29,7 +30,7 @@ app.use(cors());
 
 mongoose.connect("mongodb+srv://Peter:TZ8eXrltEYMuVdQb@cluster0.f1z37qq.mongodb.net/Graduation_Project")
     .then(() => {
-        Server.listen(PORT, () => {
+        Server.listen(PORT, IP,  () => {
 
             app.get("/", (req, res) => {
                 res.send("hello to server")

@@ -51,10 +51,10 @@ module.exports = () => {
             }
 
             if (type === 'consumer') {
-                ConsumerIdMap.setCurrentAndSocket(id, socket);
+                ConsumerIdMap.setCurrentAndSocket(+id, socket);
                 console.log("consumer " + id + " connected to socket");
             } else if (type === 'provider') {
-                ProviderIdMap.setCurrentAndSocket(id, socket, true);
+                ProviderIdMap.setCurrentAndSocket(+id, socket, true);
                 console.log("provider " + id + " connected to socket");
             } else {
                 console.error('Invalid type');
@@ -163,18 +163,32 @@ module.exports = () => {
 
             try {
                 console.log("current location " + location + " target location " + targetLocation);
-
+                const providerSocket = ProviderIdMap.getSocketInfo(+providerId);
+                const consumerSocket = ConsumerIdMap.getSocketInfo(+consumerId);
+                
                 if (+location === +targetLocation) {
-                    const providerSocket = ProviderIdMap.getSocketInfo(providerId);
+
                     if (providerSocket) {
                         providerSocket.emit("HasArrived");
                         console.log(providerId + " has arrived to " + consumerId);
+                    } else {
+                        console.log("Provider Socket Not Present");
                     }
+
+                    if (consumerSocket) {
+                        consumerSocket.emit("notification", { message: `${providerId} has arrived` })
+                    } else {
+                        console.log("Consumer Socket Not Present");
+
+                    }
+
                 } else {
-                    const consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
+
                     if (consumerSocket) {
                         consumerSocket.emit("Tracking", { trackingMessage: location });
                         console.log(consumerId + " is tracking " + providerId);
+                    } else {
+                        console.log("Consumer Socket Not Present");
                     }
                 }
             } catch (error) {
