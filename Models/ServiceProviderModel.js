@@ -55,23 +55,17 @@ const serviceProviderSchema = new mongoose.Schema({
         type: String
     },
 
-    // driving_lic: {
-    //     type: String,
-    //     required: true,
-    //     match: /^https:\/\/.+/
-    // },
+    driving_lic: {
+        type: String,
+    },
 
-    // car_lic: {
-    //     type: String,
-    //     required: true,
-    //     match: /^https:\/\/.+/
-    // },
+    car_lic: {
+        type: String,
+    },
 
-    // nid_pic: {
-    //     type: String,
-    //     required: true,
-    //     match: /^https:\/\/.+/
-    // },
+    nid_pic: {
+        type: String,
+    },
 
     owned_car: {
         make: { type: String, required: true },
@@ -83,7 +77,10 @@ const serviceProviderSchema = new mongoose.Schema({
 
 serviceProviderSchema.pre('save', function (next) {
     if (this.email) {
-        this.profile_pic = `${this.email}_Profile.jpg`;
+        this.profile_pic = `${this.email.split('.')[0]}_profile_pic`;
+        this.car_lic = `${this.email.split('.')[0]}_car_licence`;
+        this.nid_pic = `${this.email.split('.')[0]}_national_id_pic`;
+        this.driving_lic = `${this.email.split('.')[0]}_driver_licence_pic`;
     }
 
     this.status = "available";

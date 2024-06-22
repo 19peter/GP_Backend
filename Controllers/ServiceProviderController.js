@@ -2,9 +2,8 @@ const serviceProviderModel = require('../Models/ServiceProviderModel');
 
 let createServiceProvider = async (req, res, next) => {
     try {
-        let userData = req.body.data;
-        let parsedData = JSON.parse(userData);
-        let { email } = parsedData;
+        let userData = req.body;
+        let { email, make, model, year, license_plate } = userData;
         let duplicateEmail = await serviceProviderModel.findOne({ email: email });
 
         if (duplicateEmail) {
@@ -14,16 +13,15 @@ let createServiceProvider = async (req, res, next) => {
         const keysToRemove = ['make', 'model', 'year'];
 
         let owned_car = {};
-        let sanitizedUser = Object.keys(parsedData).reduce((acc, key) => {
+        let sanitizedUser = Object.keys(userData).reduce((acc, key) => {
             if (!keysToRemove.includes(key)) {
-                acc[key] = parsedData[key];
-                // console.log(acc);
+                acc[key] = userData[key];
             }
             return acc;
         }, {})
 
         if (make && model && year) {
-            owned_car = { make, model, year };
+            owned_car = { make, model, year, license_plate: license_plate ? license_plate : 'abcd 123' };
         }
 
         sanitizedUser.owned_car = owned_car;
@@ -33,7 +31,7 @@ let createServiceProvider = async (req, res, next) => {
         newSProvider.save()
             .then(() => {
                 req.newSProvider = newSProvider;
-                next();
+                return res.json(newSProvider).status(200);
             })
             .catch((e) => {
                 console.log(e);
