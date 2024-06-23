@@ -2,28 +2,26 @@ const userModel = require('../Models/UserModel');
 
 let createUser = async(req, res) => {
     let data = req.body;
-    let { make, model, year } = data;
+    let { car_make, model, year } = data;
     let owned_cars = [];
     let newUser;
 
-    let duplicateEmail = await userModel.findOne({email : email});
+    let duplicateEmail = await userModel.findOne({email : data.email});
 
     if (duplicateEmail) {
         return res.status(400).json("Bad Request, Email is already registered")
     }
-
-    const keysToRemove = ['make', 'model', 'year'];
+    const keysToRemove = ['car_make', 'model', 'year'];
 
     let sanitizedUser = Object.keys(data).reduce((acc, key) => {
         if (!keysToRemove.includes(key)) {
             acc[key] = data[key];
-            console.log(acc);
         }
         return acc;
     }, {})
 
-    if (make && model && year) {
-        owned_cars.push({ make, model, year })
+    if (car_make && model && year) {
+        owned_cars.push({ make: car_make, model, year })
     }
 
     sanitizedUser.owned_cars = owned_cars;
@@ -37,7 +35,7 @@ let createUser = async(req, res) => {
 
     newUser.save()
         .then(() => {
-            return res.json({ newUser });
+            return res.json({ newUser }).status(200);
         })
         .catch((e) => {
             console.log(e);
