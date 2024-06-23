@@ -26,7 +26,7 @@ const serviceProviderSchema = new mongoose.Schema({
 
     service_type: {
         type: String,
-        enum: ["repair", "pickUp", "pickUp and repair"],
+        enum: ["repair", "pickup", "pickup and repair"],
         required: true
     },
 
