@@ -11,19 +11,14 @@ let createUser = async(req, res) => {
     if (duplicateEmail) {
         return res.status(400).json("Bad Request, Email is already registered")
     }
-    // console.log(data);
     const keysToRemove = ['car_make', 'model', 'year'];
 
     let sanitizedUser = Object.keys(data).reduce((acc, key) => {
         if (!keysToRemove.includes(key)) {
             acc[key] = data[key];
-            // console.log(acc);
         }
         return acc;
     }, {})
-    console.log(car_make)
-    console.log(model)
-    console.log(year)
 
     if (car_make && model && year) {
         owned_cars.push({ make: car_make, model, year })
