@@ -25,6 +25,8 @@ const userSchema = new mongoose.Schema({
     owned_cars : {
         type: [{make : String, model : String, year: Number}],
     },
+
+  
 })
 
 module.exports = mongoose.model("users", userSchema);

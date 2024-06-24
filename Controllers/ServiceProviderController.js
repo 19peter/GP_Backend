@@ -1,8 +1,34 @@
 const serviceProviderModel = require('../Models/ServiceProviderModel');
 
+
+let getCount = async (req,res)=>{
+    let usersCount = await serviceProviderModel.countDocuments({});
+    return res.json(usersCount).status(200);
+}
+
+let getUnapproved = async (req,res)=>{
+    let unapprovedServiceProviders = await serviceProviderModel.find({approvalStatus:"pending"})
+    return res.json(unapprovedServiceProviders).status(200);
+}
+
+let changeApprovalStatus = async (req,res)=>{
+    let {email, status} = req.body;
+    let sp = await serviceProviderModel.findOneAndUpdate({email:email},{$set:{approvalStatus: status}})
+    .then(doc => {
+        console.log("Updated Document:", doc);
+        return res.json("status updated")
+      })
+      .catch(err => {
+        console.error("Error:", err);
+      });
+
+}
+
 let createServiceProvider = async (req, res, next) => {
     try {
         let userData = req.body;
+        userData.approvalStatus = "pending"
+        console.log(userData);
         let { email, make, model, year, license_plate } = userData;
         let duplicateEmail = await serviceProviderModel.findOne({ email: email });
 
@@ -231,7 +257,10 @@ module.exports = {
     setInitialLocation,
     getCheapestProviders,
     getProviderByName,
-    getNearestProviders
+    getNearestProviders,
+    getCount,
+    getUnapproved,
+    changeApprovalStatus
 }
 
 

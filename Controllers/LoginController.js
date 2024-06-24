@@ -1,6 +1,7 @@
 const ServiceProviderModel = require("../Models/ServiceProviderModel");
 const UserModel = require("../Models/UserModel")
 
+
 let consumerLogin = async (req,res)=>{
     let {email,password} = req.body
     let user = await UserModel.findOne({ email: email });
