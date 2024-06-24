@@ -6,6 +6,8 @@ const LoginController = require('../Controllers/LoginController');
 //consumer login
 router.post('/login',LoginController.consumerLogin)
 
+router.get('/:id', UserController.getUser);
+
 router.post('/', UserController.createUser);
 
 router.put('/:id', UserController.updateUser);
