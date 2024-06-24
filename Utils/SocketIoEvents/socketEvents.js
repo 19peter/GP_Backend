@@ -51,10 +51,10 @@ module.exports = () => {
             }
 
             if (type === 'consumer') {
-                ConsumerIdMap.setCurrentAndSocket(+id, socket);
+                ConsumerIdMap.setCurrentAndSocket(id, socket);
                 console.log("consumer " + id + " connected to socket");
             } else if (type === 'provider') {
-                ProviderIdMap.setCurrentAndSocket(+id, socket, true);
+                ProviderIdMap.setCurrentAndSocket(id, socket, true);
                 console.log("provider " + id + " connected to socket");
             } else {
                 console.error('Invalid type');
@@ -70,7 +70,6 @@ module.exports = () => {
                 socket.emit('error', { message: 'GetNearBy failed: Missing consumerId' });
                 return;
             }
-
             try {
                 ConsumerNearByProviderIdMap.deleteConsumer(consumerId);
 
@@ -116,8 +115,8 @@ module.exports = () => {
             }
         });
 
-        socket.on("SentRequest", ({ userId: consumerId, targetId: providerId, location: consumerLocation }) => {
-            if (!consumerId || !providerId || !consumerLocation) {
+        socket.on("SentRequest", ({ userId: consumerId, targetId: providerId, location: consumerLocation, distance }) => {
+            if (!consumerId || !providerId || !consumerLocation || !distance) {
                 console.error('SentRequest: Missing required fields');
                 socket.emit('error', { message: 'SentRequest failed: Missing required fields' });
                 return;
@@ -126,7 +125,7 @@ module.exports = () => {
             try {
                 const providerSocket = ProviderIdMap.getSocketInfo(providerId);
                 if (providerSocket) {
-                    providerSocket.emit("IncomingRequest", { requestMessage: "Allow Request ?", consumerLocation, consumerId });
+                    providerSocket.emit("IncomingRequest", { requestMessage: "Allow Request ?", consumerLocation, consumerId, distance});
                     console.log(consumerId + " requested " + providerId);
                 } else {
                     console.error('Provider not found');
@@ -163,8 +162,8 @@ module.exports = () => {
 
             try {
                 console.log("current location " + location + " target location " + targetLocation);
-                const providerSocket = ProviderIdMap.getSocketInfo(+providerId);
-                const consumerSocket = ConsumerIdMap.getSocketInfo(+consumerId);
+                const providerSocket = ProviderIdMap.getSocketInfo(providerId);
+                const consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
                 
                 if (+location === +targetLocation) {
 
@@ -201,12 +200,12 @@ module.exports = () => {
             console.log("An Error Occured");
         })
 
-        socket.on('disconnect', ({ id, type }) => {
-            if (!id || !type) {
-                console.error('Connected: Missing id or type');
-                socket.emit('error', { message: 'Connection failed: Missing id or type' });
-                return;
-            }
+        socket.on('disconnected', ({ id, type }) => {
+            // if (!id || !type) {
+            //     console.error('Connected: Missing id or type');
+            //     socket.emit('error', { message: 'Connection failed: Missing id or type' });
+            //     return;
+            // }
             try {
                 if (type === 'consumer') {
                     ConsumerIdMap.deleteConsumer(id);
