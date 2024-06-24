@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../Controllers/UserController');
+const LoginController = require('../Controllers/LoginController');
 
-
+//consumer login
+router.post('/login',LoginController.consumerLogin)
 
 router.post('/', UserController.createUser);
 
