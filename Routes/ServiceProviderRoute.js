@@ -5,17 +5,24 @@ const ServiceProviderController = require('../Controllers/ServiceProviderControl
 const LoginController = require('../Controllers/LoginController')
 
 
-router.post('/', ServiceProviderController.createServiceProvider);
-router.get('/unapproved',ServiceProviderController.getUnapproved)
-router.post('/updateApprovalStatus',ServiceProviderController.changeApprovalStatus)
-router.post('/login',LoginController.ProviderLogin)
 router.get('/', ServiceProviderController.getServiceProvider);
-router.get('/count',ServiceProviderController.getCount)
+
+router.get('/unapproved', ServiceProviderController.getUnapproved)
+
+router.get('/count', ServiceProviderController.getCount)
+
 router.get('/nearest', ServiceProviderController.getNearestProviders);
 
+
 router.post('/', ServiceProviderController.createServiceProvider);
+
+router.post('/', ServiceProviderController.createServiceProvider);
+
+router.post('/updateApprovalStatus', ServiceProviderController.changeApprovalStatus)
+
+router.post('/login', LoginController.ProviderLogin)
 
 router.post('/providers', ServiceProviderController.getServiceProvidersByIds);
 
-router.post('/login',LoginController.ProviderLogin)
+// router.post('/login', LoginController.ProviderLogin)
 module.exports = router;
