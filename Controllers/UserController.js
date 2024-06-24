@@ -1,5 +1,11 @@
 const userModel = require('../Models/UserModel');
 
+
+let getCount = async (req,res)=>{
+    let usersCount = await userModel.countDocuments({});
+    return res.json(usersCount).status(200);
+}
+
 let getUser = async (req, res) => {
     let id = req.params.id;
     let user = await userModel.findOne({ _id: id });
@@ -182,4 +188,4 @@ let deleteUser = async (req, res) => {
 }
 
 
-module.exports = { getUser, createUser, updateUser, updateUserCars, updateCurrentCar, deleteCar, deleteUser }
+module.exports = { getUser, createUser, updateUser, updateUserCars, updateCurrentCar, deleteCar, deleteUser, getCount }
