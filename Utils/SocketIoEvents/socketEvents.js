@@ -79,6 +79,8 @@ module.exports = () => {
     });
 
     socket.on("GetNearBy", ({ userId: consumerId }) => {
+      console.log("nearBy");
+      console.log("con : ", consumerId);
       if (!consumerId) {
         console.error("GetNearBy: Missing consumerId");
         socket.emit("error", {
@@ -160,6 +162,11 @@ module.exports = () => {
         distance,
       }) => {
         if (!consumerId || !providerId || !consumerLocation || !distance) {
+          console.log(consumerId);
+          console.log(providerId);
+          console.log(consumerLocation);
+          console.log(distance);
+
           console.error("SentRequest: Missing required fields");
           socket.emit("error", {
             message: "SentRequest failed: Missing required fields",
