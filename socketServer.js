@@ -7,14 +7,15 @@ const IdMap = require('./Utils/ConnectedUsers/connectedConsumers');
 
 const TestRouter = require('./Routes/TestingRoute')
 const UserRouter = require("./Routes/UserRoutes");
+const AnalysisRouter = require('./Routes/analysisRoute')
 const ServiceProviderRouter = require('./Routes/ServiceProviderRoute');
 
 const PORT = 8000;
-const IP = '192.168.1.10';
+const IP = '192.168.1.2';
 const app = express();
 const Server = http.createServer(app);
 
-////Socket Init... !DONOT CHANGE!...
+////Socket Init... !DO NOT CHANGE!...
 const io = socketIo(Server, {
     cors: '*'
 });
@@ -40,6 +41,7 @@ mongoose.connect("mongodb+srv://Peter:TZ8eXrltEYMuVdQb@cluster0.f1z37qq.mongodb.
 
             app.use('/api/serviceProvider', ServiceProviderRouter);
 
+            app.use('/api/analysis',AnalysisRouter)
             ///TESTING ROUTE
             app.use('/api/test', TestRouter);
 
