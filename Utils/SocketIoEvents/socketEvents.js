@@ -78,7 +78,7 @@ module.exports = () => {
 
       console.log(ProviderIdMap);
       console.log(ConsumerIdMap);
-      socket.emit("notification", { message: "welcome" });
+      socket.emit("notification", { welcomeMessage: "welcome" });
     });
 
     socket.on("GetNearBy", ({ userId: consumerId }) => {
@@ -366,7 +366,7 @@ module.exports = () => {
 
             if (consumerSocket) {
               consumerSocket.emit("notification", {
-                message: `${providerId} has arrived`,
+                arrivalMessage: `${providerId} has arrived`,
               });
             } else {
               console.log("Consumer Socket Not Present");
@@ -418,6 +418,23 @@ module.exports = () => {
       }
     );
 
+    socket.on("ServiceEnded", ({ providerId, consumerId }) => {
+      if (!providerId || !consumerId) {
+        console.error("ServiceEnded: Missing required fields");
+        socket.emit("error", {
+          message: "ServiceEnded failed: Missing required fields",
+        });
+        return;
+      }
+      try {
+        const consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
+        if (consumerSocket) {
+          consumerSocket.emit("ServiceEnded", { providerId });
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
     socket.on("error", ({ message }) => {
       console.log("An Error Occured");
     });
