@@ -20,16 +20,33 @@
 
 
 //----------SendRequest Functionality
-
 ///Consumer => ("SentRequest", {consumerId, providerId - targetId- , consumerLocation}) => Server => ("IncomingRequest", consumerLocation, consumerId) => Provider
 ///{
 ///Provider => ("Tracked", {providerId, consumerId, providerLiveLocation, consumerLocation}) => Server => ("Tracking", providerLiveLocation) => Consumer
 ///Provider => ("Tracked", {providerId, consumerId, providerLiveLocation, consumerLocation}) => Server => ("Tracking", providerLiveLocation) => Consumer
 ///Provider => ("Tracked", {providerId, consumerId, providerLiveLocation, consumerLocation}) => Server => ("Tracking", providerLiveLocation) => Consumer
 ///}
-///Provider => "HasArrived" => Server => "ProviderArrived" => Consumer
-///Provider => "HasArrived" => Server => "HasArrived" => Provider
 
+///Server => "HasArrived" => Provider
+///Server --> Change ProviderState to available
+///-----------------------------------------------------------------------------------///
+
+
+//----------SentPickUpRequest Functionality
+///Consumer => ("SentPickUpRequest", {consumerId, providerId - targetId- , consumerLocation, targetLocation}) => Server => ("IncomingPickUpRequest" + data) => Provider
+///{
+///Provider => ("PickUpTracking", {providerId, consumerId, providerLiveLocation, targetLocation "consumer"}) => Server => ("Tracking", providerLiveLocation) => Consumer
+///Provider => ("PickUpTracking", {providerId, consumerId, providerLiveLocation, targetLocation }) => Server => ("Tracking", providerLiveLocation) => Consumer
+///Provider => ("PickUpTracking", {providerId, consumerId, providerLiveLocation, targetLocation }) => Server => ("Tracking", providerLiveLocation) => Consumer
+///}
+/// Server => ("StartPickup", {TargetLocation} ) => Provider
+///{
+///Provider => ("PickUpTracking", {providerId, consumerId, providerLiveLocation, targetLocation "destination"}) => Server 
+///Provider => ("PickUpTracking", {providerId, consumerId, providerLiveLocation, targetLocation}) => Server 
+///Provider => ("PickUpTracking", {providerId, consumerId, providerLiveLocation, targetLocation}) => Server
+///}
+///Server => ("PickUpFinished") => Provider
+///Server --> Change ProviderState to available
 ///-----------------------------------------------------------------------------------///
 
 
@@ -125,7 +142,7 @@ module.exports = () => {
             try {
                 const providerSocket = ProviderIdMap.getSocketInfo(providerId);
                 if (providerSocket) {
-                    providerSocket.emit("IncomingRequest", { requestMessage: "Allow Request ?", consumerLocation, consumerId, distance});
+                    providerSocket.emit("IncomingRequest", { requestMessage: "Allow Request ?", consumerLocation, consumerId, distance });
                     console.log(consumerId + " requested " + providerId);
                 } else {
                     console.error('Provider not found');
@@ -136,6 +153,29 @@ module.exports = () => {
                 socket.emit('error', { message: 'SentRequest failed: ' + error.message });
             }
         });
+
+        socket.on("SentPickUpRequest", ({ userId: consumerId, targetId: providerId, location: consumerLocation, distance, targetLocation }) => {
+            if (!consumerId || !providerId || !consumerLocation || !distance || targetLocation) {
+                console.error('SentRequest: Missing required fields');
+                socket.emit('error', { message: 'SentRequest failed: Missing required fields' });
+                return;
+            }
+
+            try {
+                const providerSocket = ProviderIdMap.getSocketInfo(providerId);
+                if (providerSocket) {
+                    providerSocket.emit("IncomingPickUpRequest", { requestMessage: "Allow Request ?", consumerLocation, consumerId, distance, targetLocation });
+                    console.log(consumerId + " pickup requested " + providerId);
+                } else {
+                    console.error('Provider not found');
+                    socket.emit('error', { message: 'SentPickUpRequest failed: Provider not found' });
+                }
+            } catch (error) {
+                console.error('Error in SentPickUpRequest:', error);
+                socket.emit('error', { message: 'SentPickUpRequest failed: ' + error.message });
+            }
+        });
+
 
         socket.on("RequestAccepted", ({ consumerId, userId: providerId }) => {
             if (!consumerId || !providerId) {
@@ -153,6 +193,32 @@ module.exports = () => {
             }
         });
 
+        socket.on("PickUpTracking", ({ userId: providerId, targetId: consumerId, providerLiveLocation, targetLocation, startPickUp }) => {
+            if (!providerId || !consumerId || !providerLiveLocation || !targetLocation) {
+                console.error('PickUpTracking: Missing required fields');
+                socket.emit('error', { message: 'PickUpTracking failed: Missing required fields' });
+                return;
+            }
+
+            try {
+                if (providerLiveLocation.latitude === targetLocation.latitude && providerLiveLocation.longitude === targetLocation.longitude) {
+                    const providerSocket = ProviderIdMap.getSocketInfo(providerId);
+                    if (providerSocket) {
+                        if (!startPickUp) {
+                            providerSocket.emit("StartPickUp");
+                        } else {
+                            providerSocket.emit("PickUpFinished");
+                            ProviderIdMap.setProviderAvailabilityState(providerId, true);
+                        }
+                    }
+                }
+
+            } catch (e) {
+                console.error('Error in PickUpTracking:', error);
+                socket.emit('error', { message: 'PickUpTracking failed: ' + error.message });
+            }
+        })
+
         socket.on("Tracked", ({ userId: providerId, targetId: consumerId, location, targetLocation }) => {
             if (!providerId || !consumerId || !location || !targetLocation) {
                 console.error('Tracked: Missing required fields');
@@ -164,12 +230,14 @@ module.exports = () => {
                 console.log("current location " + location + " target location " + targetLocation);
                 const providerSocket = ProviderIdMap.getSocketInfo(providerId);
                 const consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
-                
-                if (+location === +targetLocation) {
+
+                if (+location.latitude === +targetLocation.latitude && +location.longitude === +targetLocation.longitude) {
 
                     if (providerSocket) {
                         providerSocket.emit("HasArrived");
+                        ProviderIdMap.setProviderAvailabilityState(providerId, true);
                         console.log(providerId + " has arrived to " + consumerId);
+
                     } else {
                         console.log("Provider Socket Not Present");
                     }
@@ -195,6 +263,28 @@ module.exports = () => {
                 socket.emit('error', { message: 'Tracking failed: ' + error.message });
             }
         });
+
+        socket.on("PickUpProviderArrived", ({ userId: consumerId, targetId: providerId, targetLocation }) => {
+            if (!providerId) {
+                console.error('PickUpProviderArrived: Missing required fields');
+                socket.emit('error', { message: 'SentRequest failed: Missing required fields' });
+                return;
+            }
+            try {
+                const providerSocket = ProviderIdMap.getSocketInfo(providerId);
+                if (providerSocket) {
+                    providerSocket.emit("StartPickUp", { consumerId, targetLocation });
+                    console.log(consumerId + " StartPickUp " + providerId);
+                } else {
+                    console.error('Provider not found');
+                    socket.emit('error', { message: 'PickUpProviderArrived failed: Provider not found' });
+                }
+            } catch (error) {
+                console.error('Error in PickUpProviderArrived:', error);
+                socket.emit('error', { message: 'PickUpProviderArrived failed: ' + error.message });
+            }
+
+        })
 
         socket.on('error', ({ message }) => {
             console.log("An Error Occured");
