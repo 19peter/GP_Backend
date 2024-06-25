@@ -34,5 +34,4 @@ class IdMap {
 
 const idMapInstance = new IdMap();
 Object.freeze(idMapInstance);
-
 module.exports = idMapInstance;

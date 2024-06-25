@@ -19,6 +19,7 @@
 
 //----------SendRequest Functionality
 ///Consumer => ("SentRequest", {consumerId, providerId - targetId- , consumerLocation}) => Server => ("IncomingRequest", consumerLocation, consumerId) => Provider
+///
 ///{
 ///Provider => ("Tracked", {providerId, consumerId, providerLiveLocation, consumerLocation}) => Server => ("Tracking", providerLiveLocation) => Consumer
 ///Provider => ("Tracked", {providerId, consumerId, providerLiveLocation, consumerLocation}) => Server => ("Tracking", providerLiveLocation) => Consumer
@@ -75,12 +76,12 @@ module.exports = () => {
         socket.emit("error", { message: "Connection failed: Invalid type" });
       }
 
+      console.log(ProviderIdMap);
+      console.log(ConsumerIdMap);
       socket.emit("notification", { message: "welcome" });
     });
 
     socket.on("GetNearBy", ({ userId: consumerId }) => {
-      console.log("nearBy");
-      console.log("con : ", consumerId);
       if (!consumerId) {
         console.error("GetNearBy: Missing consumerId");
         socket.emit("error", {
@@ -89,6 +90,7 @@ module.exports = () => {
         return;
       }
       try {
+        console.log("here");
         ConsumerNearByProviderIdMap.deleteConsumer(consumerId);
 
         let idMap = Object.values(ProviderIdMap)[0];
@@ -259,6 +261,8 @@ module.exports = () => {
 
       try {
         ConsumerNearByProviderIdMap.deleteConsumer(consumerId);
+        let consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
+        consumerSocket.emit("RequestAccepted", { providerId });
         ProviderIdMap.setProviderAvailabilityState(providerId, false);
       } catch (error) {
         console.error("Error in RequestAccepted:", error);
@@ -340,9 +344,17 @@ module.exports = () => {
           const providerSocket = ProviderIdMap.getSocketInfo(providerId);
           const consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
 
+          // console.log(+location.latitude.toFixed(4));
+          // console.log(+targetLocation.latitude.toFixed(4));
+
+          // console.log(+location.longitude.toFixed(4));
+          // console.log(+targetLocation.longitude.toFixed(4));
+
           if (
-            +location.latitude === +targetLocation.latitude &&
-            +location.longitude === +targetLocation.longitude
+            +location.latitude.toFixed(3) ===
+              +targetLocation.latitude.toFixed(3) &&
+            +location.longitude.toFixed(2) ===
+              +targetLocation.longitude.toFixed(2)
           ) {
             if (providerSocket) {
               providerSocket.emit("HasArrived");
@@ -411,11 +423,13 @@ module.exports = () => {
     });
 
     socket.on("disconnected", ({ id, type }) => {
-      // if (!id || !type) {
-      //     console.error('Connected: Missing id or type');
-      //     socket.emit('error', { message: 'Connection failed: Missing id or type' });
-      //     return;
-      // }
+      if (!id || !type) {
+        console.error("disconnecting: Missing id or type");
+        socket.emit("error", {
+          message: "Connection failed: Missing id or type",
+        });
+        return;
+      }
       try {
         if (type === "consumer") {
           ConsumerIdMap.deleteConsumer(id);
@@ -423,6 +437,7 @@ module.exports = () => {
           console.log("consumer " + id + " disconnected");
         } else if (type === "provider") {
           ProviderIdMap.deleteProvider(id);
+          ConsumerNearByProviderIdMap.removeProviderFromConsumers(id);
           console.log("provider " + id + " disconnected");
         } else {
           console.error("Invalid type");
@@ -435,13 +450,3 @@ module.exports = () => {
     });
   });
 };
-
-// socket.on("arrived", ({ userId, targetId, location }) => {
-//     const socketInfo = IdMap.getSocketInfo(targetId);
-//     if (socketInfo) {
-//         const socket = socketInfo.socket;
-//         socket.emit("arrived")
-//         console.log(userId + " arrived to " + targetId);
-//     }
-
-// })
