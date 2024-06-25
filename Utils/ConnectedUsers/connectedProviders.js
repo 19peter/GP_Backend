@@ -18,12 +18,14 @@ class IdMap {
 
 
     setCurrentAndSocket(id, socketInfo, availabilityState) {
-        let obj = {...socketInfo, isAvailable : availabilityState};
-        Object.assign(socketInfo, obj);
-        // socketInfo.isAvailable = availabilityState;
-        this.idMap.set(id, socketInfo);
+        if (!this.idMap.has(id)) {
+            let obj = { ...socketInfo, isAvailable: availabilityState };
+            Object.assign(socketInfo, obj);
+            // socketInfo.isAvailable = availabilityState;
+            this.idMap.set(id, socketInfo);
+        }
     }
-    
+
     setCurrentId(id) {
         this.idMap.set(id, null);
     }

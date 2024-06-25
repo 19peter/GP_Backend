@@ -60,6 +60,12 @@ class IdMap {
         return this.getProvidersForConsumer(id).length;
     }
 
+    removeProviderFromConsumers(id) {
+        for (let consumerId in this.idMap) {
+            this.idMap[consumerId] = this.idMap.filter(obj => obj.providerId !== id) 
+        }
+    }
+
     deleteConsumer(id) {
         this.idMap.delete(id);
     }
