@@ -12,6 +12,29 @@ let getUnapproved = async (req, res) => {
   return res.json(unapprovedServiceProviders).status(200);
 };
 
+let getRating = async (req, res) => {
+  console.log(req.body);
+  let provider = await serviceProviderModel.findOne({
+    _id: req.body.providerId,
+  });
+  return res.json(provider.rating).status(200);
+};
+
+let updateRating = async (req, res) => {
+  console.log(req.body);
+  let provider = await serviceProviderModel.findOneAndUpdate(
+    { _id: req.body.providerId },
+    { rating: req.body.rating }
+  );
+  return res.json("updated successfully").status(200);
+};
+
+let getApprovalStatus = async (req, res) => {
+  console.log(req.body);
+  let status = await serviceProviderModel.findOne({ _id: req.body.providerId });
+  console.log(status);
+  return res.json(status.approvalStatus).status(200);
+};
 let changeApprovalStatus = async (req, res) => {
   let { email, status } = req.body;
   let sp = await serviceProviderModel
@@ -48,12 +71,7 @@ let createServiceProvider = async (req, res, next) => {
     }, {});
 
     if (make && model && year) {
-      owned_car = {
-        make,
-        model,
-        year,
-        license_plate: license_plate ? license_plate : "abcd 123",
-      };
+      owned_car = { make, model, year, license_plate };
     }
 
     sanitizedUser.owned_car = owned_car;
@@ -251,4 +269,7 @@ module.exports = {
   getCount,
   getUnapproved,
   changeApprovalStatus,
+  getApprovalStatus,
+  getRating,
+  updateRating,
 };
