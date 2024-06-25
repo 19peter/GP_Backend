@@ -10,7 +10,7 @@ const UserRouter = require("./Routes/UserRoutes");
 const ServiceProviderRouter = require('./Routes/ServiceProviderRoute');
 
 const PORT = 8000;
-const IP = '192.168.1.5';
+const IP = '192.168.1.4';
 const app = express();
 const Server = http.createServer(app);
 
