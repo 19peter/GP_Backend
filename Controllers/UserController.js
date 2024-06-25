@@ -1,12 +1,30 @@
 const userModel = require('../Models/UserModel');
 
-let createUser = async(req, res) => {
+
+let getCount = async (req,res)=>{
+    let usersCount = await userModel.countDocuments({});
+    return res.json(usersCount).status(200);
+}
+
+let getUser = async (req, res) => {
+    let id = req.params.id;
+    let user = await userModel.findOne({ _id: id });
+    if (!user) {
+        return res.status(404).json("User Not Found");
+    }
+
+    return res.status(200).json({ user });
+
+
+}
+
+let createUser = async (req, res) => {
     let data = req.body;
     let { car_make, model, year } = data;
     let owned_cars = [];
     let newUser;
 
-    let duplicateEmail = await userModel.findOne({email : data.email});
+    let duplicateEmail = await userModel.findOne({ email: data.email });
 
     if (duplicateEmail) {
         return res.status(400).json("Bad Request, Email is already registered")
@@ -170,4 +188,4 @@ let deleteUser = async (req, res) => {
 }
 
 
-module.exports = { createUser, updateUser, updateUserCars, updateCurrentCar, deleteCar, deleteUser }
+module.exports = { getUser, createUser, updateUser, updateUserCars, updateCurrentCar, deleteCar, deleteUser, getCount }
