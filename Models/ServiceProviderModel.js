@@ -76,7 +76,12 @@ const serviceProviderSchema = new mongoose.Schema({
     approvalStatus: {
         type: String,
         enum: ["approved", "pending", "rejected"]
+    },
+    rating:{
+        type:Number,
+        default:0
     }
+
 })
 
 serviceProviderSchema.pre('save', function (next) {

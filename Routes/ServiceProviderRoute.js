@@ -13,8 +13,12 @@ router.get('/count', ServiceProviderController.getCount)
 
 router.get('/nearest', ServiceProviderController.getNearestProviders);
 
+router.post('/approvalStatus',ServiceProviderController.getApprovalStatus)
 
 router.post('/', ServiceProviderController.createServiceProvider);
+router.post('/getRating',ServiceProviderController.getRating);
+router.post('/updateRating',ServiceProviderController.updateRating);
+
 
 router.post('/', ServiceProviderController.createServiceProvider);
 
