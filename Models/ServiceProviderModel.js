@@ -73,9 +73,9 @@ const serviceProviderSchema = new mongoose.Schema({
         year: { type: Number, required: true },
         license_plate: { type: String, required: true, pattern: "/^[1-9]{3,4}[A-Za-z]{2,3}$/" }
     },
-    approvalStatus:{
-        type:String,
-        enum:["approved,pending,rejected"]
+    approvalStatus: {
+        type: String,
+        enum: ["approved", "pending", "rejected"]
     }
 })
 

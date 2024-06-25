@@ -84,6 +84,25 @@ let getServiceProvider = async (req, res) => {
 
 }
 
+let getServiceProvidersByIds = async (req, res) => {
+    let idArray = req.body;
+    let providersArray = [];
+
+    if (idArray) {
+        idArray.forEach(async id => {
+            let sProvider = await serviceProviderModel.findOne({ _id: id });     
+            if (sProvider) {
+                providersArray.push(sProvider);
+            } 
+        });
+
+        return res.status(200).json({providersArray})
+    }
+
+    return res.status(400).json("Bad Request")
+
+}
+
 /// IMPLEMENTED
 let getAllServiceProviders = async (req, res) => {
 
@@ -230,6 +249,7 @@ let getLiveLocation = async (req, res) => {
 
 module.exports = {
     createServiceProvider,
+    getServiceProvidersByIds,
     getServiceProvider,
     updateLiveLocation,
     getLiveLocation,
