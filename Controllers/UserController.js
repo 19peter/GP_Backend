@@ -6,8 +6,10 @@ let getCount = async (req, res) => {
 };
 
 let getUserInfo = async (req, res) => {
+    
   const {userId} = req.body;
   console.log(req.body);
+
   let userInfo = await userModel.findOne({ _id: userId });
   if (!userInfo) {
     return res.status(404).json("User Not Found");
