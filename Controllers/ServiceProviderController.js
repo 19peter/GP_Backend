@@ -1,13 +1,13 @@
 const serviceProviderModel = require('../Models/ServiceProviderModel');
 
 
-let getCount = async (req,res)=>{
+let getCount = async (req, res) => {
     let usersCount = await serviceProviderModel.countDocuments({});
     return res.json(usersCount).status(200);
 }
 
-let getUnapproved = async (req,res)=>{
-    let unapprovedServiceProviders = await serviceProviderModel.find({approvalStatus:"pending"})
+let getUnapproved = async (req, res) => {
+    let unapprovedServiceProviders = await serviceProviderModel.find({ approvalStatus: "pending" })
     return res.json(unapprovedServiceProviders).status(200);
 }
 
@@ -106,20 +106,21 @@ let getServiceProvider = async (req, res) => {
 
 let getServiceProvidersByIds = async (req, res) => {
     let idArray = req.body;
-    let providersArray = [];
-
-    if (idArray) {
-        idArray.forEach(async id => {
-            let sProvider = await serviceProviderModel.findOne({ _id: id });     
-            if (sProvider) {
-                providersArray.push(sProvider);
-            } 
-        });
-
-        return res.status(200).json({providersArray})
+    // console.log(req.body);
+    if (!idArray || !Array.isArray(idArray)) {
+        return res.status(400).json("Bad Request");
     }
 
-    return res.status(400).json("Bad Request")
+    try {
+        let providersArray = await serviceProviderModel.find({
+            _id: { $in: idArray }
+        });
+        return res.status(200).send({ providersArray });
+    } catch (error) {
+        console.error('Error fetching service providers:', error);
+        return res.status(500).json("Internal Server Error");
+    }
+
 
 }
 

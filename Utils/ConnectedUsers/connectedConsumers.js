@@ -18,7 +18,9 @@ class IdMap {
     
 
     setCurrentAndSocket(id, socketInfo) {
-        this.idMap.set(id, socketInfo);
+        if(!this.idMap.has(id)) {
+            this.idMap.set(id, socketInfo);
+        }
     }
 
     setCurrentId(id) {
