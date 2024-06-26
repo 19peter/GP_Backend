@@ -7,6 +7,8 @@ const LoginController = require('../Controllers/LoginController');
 router.post('/login',LoginController.consumerLogin)
 router.get('/count',UserController.getCount)
 
+router.post('/profile',UserController.getUserInfo)
+
 
 router.get('/:id', UserController.getUser);
 
