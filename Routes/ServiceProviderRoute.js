@@ -1,32 +1,32 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 ///CONTROLLERS
-const ServiceProviderController = require('../Controllers/ServiceProviderController');
-const LoginController = require('../Controllers/LoginController')
+const ServiceProviderController = require("../Controllers/ServiceProviderController");
+const LoginController = require("../Controllers/LoginController");
 
+router.get("/unapproved", ServiceProviderController.getUnapproved);
 
-router.get('/', ServiceProviderController.getServiceProvider);
+router.get("/count", ServiceProviderController.getCount);
 
-router.get('/unapproved', ServiceProviderController.getUnapproved)
+router.get("/nearest", ServiceProviderController.getNearestProviders);
 
-router.get('/count', ServiceProviderController.getCount)
+router.get("/:id", ServiceProviderController.getServiceProvider);
+router.post("/approvalStatus", ServiceProviderController.getApprovalStatus);
 
-router.get('/nearest', ServiceProviderController.getNearestProviders);
+router.post("/", ServiceProviderController.createServiceProvider);
+router.post("/getRating", ServiceProviderController.getRating);
+router.post("/updateRating", ServiceProviderController.updateRating);
 
-router.post('/approvalStatus',ServiceProviderController.getApprovalStatus)
+router.post("/", ServiceProviderController.createServiceProvider);
 
-router.post('/', ServiceProviderController.createServiceProvider);
-router.post('/getRating',ServiceProviderController.getRating);
-router.post('/updateRating',ServiceProviderController.updateRating);
+router.post(
+  "/updateApprovalStatus",
+  ServiceProviderController.changeApprovalStatus
+);
 
+router.post("/login", LoginController.ProviderLogin);
 
-router.post('/', ServiceProviderController.createServiceProvider);
-
-router.post('/updateApprovalStatus', ServiceProviderController.changeApprovalStatus)
-
-router.post('/login', LoginController.ProviderLogin)
-
-router.post('/providers', ServiceProviderController.getServiceProvidersByIds);
+router.post("/providers", ServiceProviderController.getServiceProvidersByIds);
 
 // router.post('/login', LoginController.ProviderLogin)
 module.exports = router;
