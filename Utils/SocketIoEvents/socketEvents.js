@@ -81,6 +81,15 @@ module.exports = () => {
       socket.emit("notification", { welcomeMessage: "welcome" });
     });
 
+    // socket.on("notification", (data) => {
+    //   console.log(data);
+    //   if (data.CancelMessage === "Cancel") {
+    //     // ProviderIdMap.removeConsumer(data.consumerId);
+    //     // ConsumerNearByProviderIdMap.removeConsumer(data.consumerId);
+    //     ProviderIdMap.setProviderAvailabilityState(providerId, true);
+    //   }
+    // });
+
     socket.on("GetNearBy", ({ userId: consumerId }) => {
       if (!consumerId) {
         console.error("GetNearBy: Missing consumerId");
@@ -100,6 +109,7 @@ module.exports = () => {
             availableProvidersArray.push({ providerId, socket });
           }
         });
+        // console.log("ava", availableProvidersArray);
 
         let availableProvidersLength = availableProvidersArray.length;
         availableProvidersArray.forEach((provider) => {
@@ -215,7 +225,7 @@ module.exports = () => {
           !providerId ||
           !consumerLocation ||
           !distance ||
-          targetLocation
+          !targetLocation
         ) {
           console.error("SentRequest: Missing required fields");
           socket.emit("error", {
@@ -260,6 +270,10 @@ module.exports = () => {
       }
 
       try {
+        // console.log("in RequestAccepted");
+        // console.log("in consumer Id" ,consumerId);
+        // console.log("in pro Id", providerId);
+
         ConsumerNearByProviderIdMap.deleteConsumer(consumerId);
         let consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
         consumerSocket.emit("RequestAccepted", { providerId });
@@ -281,12 +295,14 @@ module.exports = () => {
         targetLocation,
         startPickUp,
       }) => {
+        // console.log("herrre in pickup tracking");
         if (
           !providerId ||
           !consumerId ||
           !providerLiveLocation ||
           !targetLocation
         ) {
+          console.log("tar", targetLocation);
           console.error("PickUpTracking: Missing required fields");
           socket.emit("error", {
             message: "PickUpTracking failed: Missing required fields",
@@ -295,24 +311,57 @@ module.exports = () => {
         }
 
         try {
+          const consumerSocket = ConsumerIdMap.getSocketInfo(consumerId);
+          const providerSocket = ProviderIdMap.getSocketInfo(providerId);
           if (
-            providerLiveLocation.latitude === targetLocation.latitude &&
-            providerLiveLocation.longitude === targetLocation.longitude
+            +providerLiveLocation.latitude.toFixed(3) ===
+              +targetLocation.latitude.toFixed(3) &&
+            +providerLiveLocation.longitude.toFixed(2) ===
+              +targetLocation.longitude.toFixed(2)
           ) {
-            const providerSocket = ProviderIdMap.getSocketInfo(providerId);
             if (providerSocket) {
               if (!startPickUp) {
+                console.log("here if start pickup");
+
                 providerSocket.emit("StartPickUp");
+
+                if (consumerSocket) {
+                  consumerSocket.emit("notification", {
+                    arrivalMessage: `${providerId} Start Pickup`,
+                  });
+                } else {
+                  console.log("Consumer Socket Not Present");
+                }
               } else {
+                console.log("here else start pickup");
+
                 providerSocket.emit("PickUpFinished");
+
+                if (consumerSocket) {
+                  consumerSocket.emit("notification", {
+                    arrivalMessage: `${providerId} has arrived And Finished Pickup`,
+                  });
+                } else {
+                  console.log("Consumer Socket Not Present");
+                }
+
                 ProviderIdMap.setProviderAvailabilityState(providerId, true);
               }
             }
+          } else {
+            if (consumerSocket) {
+              consumerSocket.emit("Tracking", {
+                trackingMessage: providerLiveLocation,
+              });
+              console.log(consumerId + " is tracking " + providerId);
+            } else {
+              console.log("Consumer Socket Not Present");
+            }
           }
         } catch (e) {
-          console.error("Error in PickUpTracking:", error);
+          console.error("Error in PickUpTracking:", e);
           socket.emit("error", {
-            message: "PickUpTracking failed: " + error.message,
+            message: "PickUpTracking failed: " + e.message,
           });
         }
       }
@@ -356,6 +405,14 @@ module.exports = () => {
             +location.longitude.toFixed(2) ===
               +targetLocation.longitude.toFixed(2)
           ) {
+            console.log(
+              "Tracked: Provider and consumer are at the same location"
+            );
+            console.log("loc lat", location.latitude);
+            console.log("loc long", location.longitude);
+            console.log("target lat", targetLocation.latitude);
+            console.log("target long", targetLocation.longitude);
+
             if (providerSocket) {
               providerSocket.emit("HasArrived");
               ProviderIdMap.setProviderAvailabilityState(providerId, true);
@@ -435,6 +492,7 @@ module.exports = () => {
         console.log(e);
       }
     });
+
     socket.on("error", ({ message }) => {
       console.log("An Error Occured");
     });

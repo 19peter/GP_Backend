@@ -255,6 +255,26 @@ let getLiveLocation = async (req, res) => {
   }
 };
 
+let addComplaint = async (req, res) => {
+  try {
+    let id = req.body.providerId;
+    let { complaint } = req.body;
+
+    let updatedProvider = await serviceProviderModel.findOne({ _id: id });
+
+    if (!updatedProvider) return res.status(404).json("provider Not Found");
+
+    updatedProvider.complaints.push(complaint);
+    await serviceProviderModel.updateOne({ _id: id }, updatedProvider, {
+      new: true,
+    });
+    return res.status(200).json({ updatedProvider });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json("error in add complaint");
+  }
+};
+
 module.exports = {
   createServiceProvider,
   getServiceProvidersByIds,
@@ -272,4 +292,5 @@ module.exports = {
   getApprovalStatus,
   getRating,
   updateRating,
+  addComplaint,
 };

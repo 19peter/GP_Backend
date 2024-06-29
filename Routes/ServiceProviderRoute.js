@@ -27,6 +27,7 @@ router.post(
 router.post("/login", LoginController.ProviderLogin);
 
 router.post("/providers", ServiceProviderController.getServiceProvidersByIds);
+router.post("/complaint", ServiceProviderController.addComplaint);
 
 // router.post('/login', LoginController.ProviderLogin)
 module.exports = router;
