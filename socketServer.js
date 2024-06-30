@@ -11,7 +11,7 @@ const AnalysisRouter = require("./Routes/analysisRoute");
 const ServiceProviderRouter = require("./Routes/ServiceProviderRoute");
 
 const PORT = 8000;
-const IP = '192.168.1.4';
+const IP = '192.168.1.2';
 const app = express();
 const Server = http.createServer(app);
 
