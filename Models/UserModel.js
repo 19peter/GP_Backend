@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema({
         type: [{make : String, model : String, year: Number}],
     },
 
+    history:{
+        type:[{providerName:String,serviceName:String,servicePrice:Number,providerId:String}]
+    }
   
 })
 

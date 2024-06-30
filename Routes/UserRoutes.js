@@ -5,12 +5,14 @@ const LoginController = require('../Controllers/LoginController');
 
 //consumer login
 router.post('/login',LoginController.consumerLogin)
+router.post('/history/:consumerId',UserController.insertHistory)
+
 router.get('/count',UserController.getCount)
 
 router.post('/profile',UserController.getUserInfo)
 
 
-router.get('/:id', UserController.getUser);
+router.post('/history',UserController.getHistory)
 
 router.post('/', UserController.createUser);
 
@@ -27,5 +29,6 @@ router.delete('/:id', UserController.deleteUser);
 ///delete a car
 router.delete('/:id/cars/:carid', UserController.deleteCar);
 
+router.get('/:id', UserController.getUser);
 
 module.exports = router;
