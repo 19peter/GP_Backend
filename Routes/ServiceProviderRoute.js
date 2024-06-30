@@ -10,6 +10,9 @@ router.get("/count", ServiceProviderController.getCount);
 
 router.get("/nearest", ServiceProviderController.getNearestProviders);
 
+router.get("/allproviders", ServiceProviderController.getAllServiceProviders)
+router.get("/providerswithcomplaints", ServiceProviderController.getServicesProvidersWithComplaints)
+
 router.get("/:id", ServiceProviderController.getServiceProvider);
 router.post("/approvalStatus", ServiceProviderController.getApprovalStatus);
 

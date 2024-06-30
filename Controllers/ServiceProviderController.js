@@ -136,6 +136,18 @@ let getAllServiceProviders = async (req, res) => {
   }
 };
 
+let getServicesProvidersWithComplaints = async (req, res) => {
+  try {
+    let sProviders = await serviceProviderModel.find({ "complaints.0": { $exists: true } });
+    return res.status(200).json({ sProviders });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json("Error Finding data");
+  }
+};
+
+
+
 let getNearestProviders = async (req, res) => {
   // console.log(req.body);
 };
@@ -293,4 +305,6 @@ module.exports = {
   getRating,
   updateRating,
   addComplaint,
+  getAllServiceProviders,
+  getServicesProvidersWithComplaints
 };
