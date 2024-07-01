@@ -109,7 +109,7 @@ module.exports = () => {
             availableProvidersArray.push({ providerId, socket });
           }
         });
-        // console.log("ava", availableProvidersArray);
+        console.log("ava", availableProvidersArray);
 
         let availableProvidersLength = availableProvidersArray.length;
         availableProvidersArray.forEach((provider) => {
@@ -172,8 +172,15 @@ module.exports = () => {
         targetId: providerId,
         location: consumerLocation,
         distance,
+        serviceType,
       }) => {
-        if (!consumerId || !providerId || !consumerLocation || !distance) {
+        if (
+          !consumerId ||
+          !providerId ||
+          !consumerLocation ||
+          !distance ||
+          !serviceType
+        ) {
           console.log(consumerId);
           console.log(providerId);
           console.log(consumerLocation);
@@ -194,6 +201,7 @@ module.exports = () => {
               consumerLocation,
               consumerId,
               distance,
+              serviceType,
             });
             console.log(consumerId + " requested " + providerId);
           } else {

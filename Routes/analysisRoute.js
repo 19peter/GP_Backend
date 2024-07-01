@@ -5,6 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 
+
 router.post('/',analysisController.insertData)
 router.get('/',analysisController.getAnalysisData)
 
